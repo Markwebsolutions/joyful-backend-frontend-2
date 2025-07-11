@@ -2,9 +2,9 @@
 let structuredData = []; // Category-centric tree
 let fileSelected = false;
 
-const CAT_URL = "http://localhost:8080/categories";
-const SUB_URL = "http://localhost:8080/subcategories";
-const PROD_URL = "http://localhost:8080/products";
+const CAT_URL = "joyful-backend-backend-final-4-production.up.railway.app/categories";
+const SUB_URL = "joyful-backend-backend-final-4-production.up.railway.app/subcategories";
+const PROD_URL = "joyful-backend-backend-final-4-production.up.railway.app/products";
 
 /* ---------------------------- error popup -------------------------- */
 function showError(message) {
