@@ -1,5 +1,5 @@
-const baseUrl = "joyful-backend-backend-final-4-production.up.railway.app/products";
-const subcategoryUrl = "joyful-backend-backend-final-4-production.up.railway.app/subcategories";
+const baseUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/products";
+const subcategoryUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/subcategories";
 
 async function loadProducts() {
   try {
