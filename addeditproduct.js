@@ -1,5 +1,5 @@
-const baseUrl = "joyful-backend-backend-final-4-production.up.railway.app/products";
-const subcategoryUrl = "joyful-backend-backend-final-4-production.up.railway.app/subcategories";
+const baseUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/products";
+const subcategoryUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/subcategories";
 
 let allSubcategories = [];
 let selectedSubcategoryIds = [];
@@ -65,7 +65,7 @@ function handleOutsideClick(e) {
     dropdown.style.display = "none";
   }
 }
-const categoryUrl = "joyful-backend-backend-final-4-production.up.railway.app/categories";
+const categoryUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/categories";
 let allCategories = [];
 let selectedCategoryIds = [];
 async function loadCategories() {
