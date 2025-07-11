@@ -1,4 +1,4 @@
-const baseUrl = " joyful-backend-backend-final-4-production.up.railway.app/categories";
+const baseUrl = "joyful-backend-backend-final-4-production.up.railway.app/categories";
 const categoryMap = new Map(); // Stores id -> category object
 let addQuill;
 let editQuill;
