@@ -1,7 +1,7 @@
-const categoryUrl = "joyful-backend-backend-final-4-production.up.railway.app/categories";
-const subcategoryUrl = "joyful-backend-backend-final-4-production.up.railway.app/subcategories";
-const productUrl = "joyful-backend-backend-final-4-production.up.railway.app/products";
-const enquiryUrl = "joyful-backend-backend-final-4-production.up.railway.app/enquiries";
+const categoryUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/categories";
+const subcategoryUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/subcategories";
+const productUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/products";
+const enquiryUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/enquiries";
 
 async function loadCategoryCount() {
   try {
