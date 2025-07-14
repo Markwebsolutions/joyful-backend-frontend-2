@@ -1,8 +1,14 @@
-const categoryUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/categories";
-const subcategoryUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/subcategories";
-const productUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/products";
-const enquiryUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/enquiries";
+const categoryUrl =
+  "https://joyful-backend-backend-final-4-production.up.railway.app/categories";
+const subcategoryUrl =
+  "https://joyful-backend-backend-final-4-production.up.railway.app/subcategories";
+const productUrl =
+  "https://joyful-backend-backend-final-4-production.up.railway.app/products";
+const enquiryUrl =
+  "https://joyful-backend-backend-final-4-production.up.railway.app/enquiries";
 
+const generalEnquiryUrl =
+  "https://joyful-backend-backend-final-4-production.up.railway.app/all-query";
 async function loadCategoryCount() {
   try {
     const res = await fetch(categoryUrl);
@@ -53,9 +59,21 @@ async function loadEnquiryCount() {
 
     document.getElementById(
       "enquiryCount"
-    ).textContent = `Enquiries: ${enquiries.length}`;
+    ).textContent = `Product Enquiry: ${enquiries.length}`;
   } catch (error) {
     console.error("Failed to load enquiries:", error);
+  }
+}
+
+async function loadGeneralEnquiryCount() {
+  try {
+    const res = await fetch(generalEnquiryUrl);
+    const data = await res.json();
+    document.getElementById(
+      "generalEnquiryCount"
+    ).textContent = `General Enquiry: ${data.length}`;
+  } catch (error) {
+    console.error("Failed to load products:", error);
   }
 }
 
@@ -63,3 +81,4 @@ loadCategoryCount();
 loadSubcategoryCount();
 loadProductCount();
 loadEnquiryCount();
+loadGeneralEnquiryCount();

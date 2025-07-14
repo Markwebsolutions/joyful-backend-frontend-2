@@ -12,7 +12,7 @@ async function getAllGeneralEnquiries() {
 
     document.getElementById(
       "generalEnquiryCount"
-    ).textContent = `Total Enquiries: ${enquiries.length}`;
+    ).textContent = `Total General Enquiries: ${enquiries.length}`;
 
     const tbody = document.getElementById("enquiryTableBody");
     tbody.innerHTML = "";
