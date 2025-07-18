@@ -1,12 +1,9 @@
-/* ----------------------------- globals ----------------------------- */
-let structuredData = []; // Category-centric tree
+// Updated csvupload.js with field validation, file size checks, error logging, and progress bar
+
+let structuredData = [];
 let fileSelected = false;
+let csvErrors = [];
 
-const CAT_URL = "https://joyful-backend-backend-final-4-production.up.railway.app/categories";
-const SUB_URL = "https://joyful-backend-backend-final-4-production.up.railway.app/subcategories";
-const PROD_URL = "https://joyful-backend-backend-final-4-production.up.railway.app/products";
-
-/* ---------------------------- error popup -------------------------- */
 function showError(message) {
   const existing = document.getElementById("error-popup");
   if (existing) existing.remove();
@@ -30,10 +27,61 @@ function showError(message) {
   setTimeout(() => div.remove(), 3000);
 }
 
-/* ------------------------- CSV → data model ----------------------- */
+function showCSVErrors() {
+  if (!csvErrors.length) return;
+  const table = document.createElement("table");
+  table.style.cssText =
+    "border-collapse: collapse; margin-top: 10px; background: #fff; border: 1px solid #ccc;";
+  table.innerHTML = `
+    <thead><tr><th style='padding: 6px; border: 1px solid #ccc;'>Row</th><th style='padding: 6px; border: 1px solid #ccc;'>Issue</th></tr></thead>
+    <tbody>
+      ${csvErrors
+        .map(
+          (e) =>
+            `<tr><td style='padding: 6px; border: 1px solid #ccc;'>${e.row}</td><td style='padding: 6px; border: 1px solid #ccc;'>${e.issue}</td></tr>`
+        )
+        .join("")}
+    </tbody>`;
+  const div = document.getElementById("error-container");
+  div.innerHTML = `<strong>⚠️ Skipped Rows:</strong>`;
+  div.appendChild(table);
+}
+
+function isTruthy(value) {
+  return value != null && String(value).trim().length > 0;
+}
 function handleCSVData(csvRows) {
   structuredData = [];
+  csvErrors = [];
+  renderPreview(); // Clear existing preview
+
   const header = csvRows[0];
+  const mandatoryFields = [
+    "CategoryName",
+    "CategoryDesc",
+    "CategorySearch",
+    "CategoryImage",
+    "CategorySeoTitle",
+    "CategorySeoKeywords",
+    "CategorySeoDesc",
+    "CategoryPublished",
+    "SubcategoryName",
+    "SubcategoryImage",
+    "SubcategoryMetaTitle",
+    "SubcategoryPublished",
+    "SubcategoryDesc",
+    "SubcategoryMetaDesc",
+    "SubcategoryKeywords",
+    "ProductName",
+    "ProductDesc",
+    "ProductImage",
+    "ProductTags",
+    "ProductFilter",
+    "ProductMetaTitle",
+    "ProductMetaDesc",
+    "ProductKeywords",
+    "ProductPublished",
+  ];
 
   for (let i = 1; i < csvRows.length; i++) {
     const row = csvRows[i];
@@ -42,136 +90,357 @@ function handleCSVData(csvRows) {
     const r = {};
     header.forEach((h, j) => (r[h.trim()] = (row[j] || "").trim()));
 
-    if (!r.CategoryName && !r.SubcategoryName && !r.ProductName) continue;
+    const missing = mandatoryFields.filter((f) => !isTruthy(r[f]));
+    if (missing.length) {
+      csvErrors.push({
+        row: i + 1,
+        issue: `Missing fields: ${missing.join(", ")}`,
+      });
+      continue;
+    }
 
-    // --- Category ---
+    // Validate ProductVariantsMap
+    const variantsMap = r.ProductVariantsMap || "{}";
+    let hasInvalidVariants = false;
+
+    if (variantsMap.trim() !== "" && variantsMap !== "{}") {
+      try {
+        JSON.parse(variantsMap);
+      } catch (e) {
+        csvErrors.push({
+          row: i + 1,
+          issue: `Invalid ProductVariantsMap format - must be valid JSON (e.g., {"color":["red"]})`,
+        });
+        hasInvalidVariants = true;
+      }
+    }
+
     let cat = structuredData.find((c) => c.name === r.CategoryName);
-    if (!cat && r.CategoryName) {
+    if (!cat) {
       cat = {
-        name: r.CategoryName || "(Unnamed Category)",
-        description: r.CategoryDesc || "",
-        searchkeywords: r.CategorySearch || "",
-        imagelink: r.CategoryImage || "",
-        seotitle: r.CategorySeoTitle || "",
-        seokeywords: r.CategorySeoKeywords || "",
-        seodescription: r.CategorySeoDesc || "",
-        published: r.CategoryPublished?.toLowerCase() !== "false",
+        name: r.CategoryName,
+        description: r.CategoryDesc,
+        searchkeywords: r.CategorySearch,
+        imagelink: r.CategoryImage,
+        seotitle: r.CategorySeoTitle,
+        seokeywords: r.CategorySeoKeywords,
+        seodescription: r.CategorySeoDesc,
+        published: r.CategoryPublished.toLowerCase() !== "false",
         subcategories: [],
       };
       structuredData.push(cat);
     }
 
-    // --- Subcategory ---
-    if (cat && r.SubcategoryName) {
-      let sub = cat.subcategories.find((s) => s.name === r.SubcategoryName);
-      if (!sub) {
-        sub = {
-          name: r.SubcategoryName || "(Unnamed Subcategory)",
-          imagepath: r.SubcategoryImage || "",
-          metatitle: r.SubcategoryMetaTitle || "",
-          ispublished: r.SubcategoryPublished?.toLowerCase() !== "false",
-          description: r.SubcategoryDesc || "",
-          metadescription: r.SubcategoryMetaDesc || "",
-          seokeywords: r.SubcategoryKeywords || "",
-          products: [],
-        };
-        cat.subcategories.push(sub);
-      }
+    let sub = cat.subcategories.find((s) => s.name === r.SubcategoryName);
+    if (!sub) {
+      sub = {
+        name: r.SubcategoryName,
+        imagepath: r.SubcategoryImage,
+        metatitle: r.SubcategoryMetaTitle,
+        ispublished: r.SubcategoryPublished.toLowerCase() !== "false",
+        description: r.SubcategoryDesc,
+        metadescription: r.SubcategoryMetaDesc,
+        seokeywords: r.SubcategoryKeywords,
+        products: [],
+      };
+      cat.subcategories.push(sub);
+    }
 
-      // --- Product ---
-      if (r.ProductName) {
-        let variantsObj = {};
-        if (r.ProductVariantsMap) {
-          try {
-            variantsObj = JSON.parse(r.ProductVariantsMap);
-          } catch {
-            console.warn("⚠️ Bad variantsMap JSON on row", i + 1);
-          }
+    sub.products.push({
+      name: r.ProductName,
+      description: r.ProductDesc,
+      mainimage: r.ProductImage,
+      producttags: r.ProductTags.split(/[,;]/)
+        .map((t) => t.trim())
+        .filter(Boolean),
+      filter: r.ProductFilter,
+      metatitle: r.ProductMetaTitle,
+      metadescription: r.ProductMetaDesc,
+      pagekeywords: r.ProductKeywords,
+      ispublished: r.ProductPublished.toLowerCase() !== "false",
+      variantsMap: variantsMap,
+      _hasInvalidVariants: hasInvalidVariants, // Flag for rendering
+    });
+  }
+
+  renderPreview();
+  showCSVErrors();
+}
+
+function renderPreview() {
+  const previewDiv = document.getElementById("preview");
+  if (!previewDiv) return;
+
+  previewDiv.innerHTML = ""; // clear old content
+
+  structuredData.forEach((cat) => {
+    const catDiv = document.createElement("div");
+    catDiv.innerHTML = `<h3>Category: ${cat.name}</h3>`;
+
+    cat.subcategories.forEach((sub) => {
+      const subDiv = document.createElement("div");
+      subDiv.innerHTML = `<h4>Subcategory: ${sub.name}</h4><ul>`;
+
+      sub.products.forEach((prod) => {
+        const li = document.createElement("li");
+        li.textContent = `Product: ${prod.name} - ${prod.description}`;
+
+        if (prod._hasInvalidVariants) {
+          li.style.color = "orange";
+          li.textContent += " (⚠️ Check variants format)";
         }
 
-        sub.products.push({
-          name: r.ProductName || "(Unnamed Product)",
-          description: r.ProductDesc || "",
-          mainimage: r.ProductImage || "",
-          producttags:
-            r.ProductTags?.split(/[,;]/)
-              .map((t) => t.trim())
-              .filter(Boolean) || [],
-          filter: r.ProductFilter || "",
-          metatitle: r.ProductMetaTitle || "",
-          metadescription: r.ProductMetaDesc || "",
-          pagekeywords: r.ProductKeywords || "",
-          ispublished: r.ProductPublished?.toLowerCase() !== "false",
-          variantsMap: variantsObj,
+        subDiv.querySelector("ul").appendChild(li);
+      });
+
+      catDiv.appendChild(subDiv);
+    });
+
+    previewDiv.appendChild(catDiv);
+  });
+}
+
+function handleCSVData(csvRows) {
+  structuredData = [];
+  csvErrors = [];
+  renderPreview(); // Just clear preview
+
+  const header = csvRows[0];
+  const mandatoryFields = [
+    "CategoryName",
+    "CategoryDesc",
+    "CategorySearch",
+    "CategoryImage",
+    "CategorySeoTitle",
+    "CategorySeoKeywords",
+    "CategorySeoDesc",
+    "CategoryPublished",
+    "SubcategoryName",
+    "SubcategoryImage",
+    "SubcategoryMetaTitle",
+    "SubcategoryPublished",
+    "SubcategoryDesc",
+    "SubcategoryMetaDesc",
+    "SubcategoryKeywords",
+    "ProductName",
+    "ProductDesc",
+    "ProductImage",
+    "ProductTags",
+    "ProductFilter",
+    "ProductMetaTitle",
+    "ProductMetaDesc",
+    "ProductKeywords",
+    "ProductPublished",
+  ];
+
+  for (let i = 1; i < csvRows.length; i++) {
+    const row = csvRows[i];
+    if (!row || row.length === 0 || row.every((cell) => !cell.trim())) continue;
+
+    const r = {};
+    header.forEach((h, j) => (r[h.trim()] = (row[j] || "").trim()));
+
+    const missing = mandatoryFields.filter((f) => !isTruthy(r[f]));
+    if (missing.length) {
+      csvErrors.push({
+        row: i + 1,
+        issue: `Missing fields: ${missing.join(", ")}`,
+      });
+      continue;
+    }
+
+    // Validate ProductVariantsMap
+    const variantsMap = r.ProductVariantsMap || "{}";
+    let hasInvalidVariants = false;
+
+    if (variantsMap.trim() !== "" && variantsMap !== "{}") {
+      try {
+        JSON.parse(variantsMap);
+      } catch (e) {
+        csvErrors.push({
+          row: i + 1,
+          issue: `Invalid ProductVariantsMap format - must be valid JSON (e.g., {"color":["red"]})`,
         });
+        hasInvalidVariants = true;
       }
     }
+
+    let cat = structuredData.find((c) => c.name === r.CategoryName);
+    if (!cat) {
+      cat = {
+        name: r.CategoryName,
+        description: r.CategoryDesc,
+        searchkeywords: r.CategorySearch,
+        imagelink: r.CategoryImage,
+        seotitle: r.CategorySeoTitle,
+        seokeywords: r.CategorySeoKeywords,
+        seodescription: r.CategorySeoDesc,
+        published: r.CategoryPublished.toLowerCase() !== "false",
+        subcategories: [],
+      };
+      structuredData.push(cat);
+    }
+
+    let sub = cat.subcategories.find((s) => s.name === r.SubcategoryName);
+    if (!sub) {
+      sub = {
+        name: r.SubcategoryName,
+        imagepath: r.SubcategoryImage,
+        metatitle: r.SubcategoryMetaTitle,
+        ispublished: r.SubcategoryPublished.toLowerCase() !== "false",
+        description: r.SubcategoryDesc,
+        metadescription: r.SubcategoryMetaDesc,
+        seokeywords: r.SubcategoryKeywords,
+        products: [],
+      };
+      cat.subcategories.push(sub);
+    }
+
+    sub.products.push({
+      name: r.ProductName,
+      description: r.ProductDesc,
+      mainimage: r.ProductImage,
+      producttags: r.ProductTags.split(/[,;]/)
+        .map((t) => t.trim())
+        .filter(Boolean),
+      filter: r.ProductFilter,
+      metatitle: r.ProductMetaTitle,
+      metadescription: r.ProductMetaDesc,
+      pagekeywords: r.ProductKeywords,
+      ispublished: r.ProductPublished.toLowerCase() !== "false",
+
+      variantsMap: variantsMap, // Just store the string value
+    });
   }
 
   renderPreview();
+  showCSVErrors();
 }
+async function postJSON(url, data) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
 
-/* ---------------------------- Preview UI --------------------------- */
-function renderPreview() {
-  const t = document.getElementById("previewTable");
-  if (!structuredData.length) {
-    t.innerHTML = "";
-    return;
+  if (!res.ok) {
+    const errorBody = await res.text();
+    throw new Error(
+      `POST ${url} failed with status ${res.status}: ${errorBody}`
+    );
   }
 
-  const bodyRows = structuredData
-    .map((c, i) => {
-      const catName = c.name || "(Unnamed Category)";
+  return res.json(); // return saved object (e.g. category with `id`)
+}
 
-      const subNames = c.subcategories
-        .map((s) => s.name || "(Unnamed Subcategory)")
-        .join("<br>");
+async function uploadCSVFile(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  // In uploadCSVFile:
+  const invalidRows = csvErrors.filter((e) =>
+    e.issue.includes("ProductVariantsMap")
+  );
+  if (invalidRows.length > 0) {
+    if (
+      !confirm(
+        `${invalidRows.length} products have variant format issues. Continue anyway?`
+      )
+    ) {
+      return;
+    }
+  }
+  const statusElem = document.getElementById("uploadStatus");
+  if (statusElem) statusElem.innerText = "⏳ Uploading...";
 
-      const prodNames = c.subcategories
-        .flatMap((s) =>
-          s.products.map((p) => p.name || "(Unnamed Product)")
-        )
-        .join("<br>");
+  try {
+    const res = await fetch("http://localhost:8080/upload-csv", {
+      method: "POST",
+      body: formData,
+    });
 
-      return `
-        <tr data-index="${i}">
-          <td>${catName}</td>
-          <td>${subNames}</td>
-          <td>${prodNames}</td>
-          <td><button onclick="removeCategory(${i})">❌</button></td>
-        </tr>`;
-    })
-    .join("");
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error("Upload failed: " + errorText);
+    }
 
-  t.innerHTML = `
+    // Safely handle empty or non-JSON responses
+    const contentType = res.headers.get("content-type");
+    let result = null;
+    if (contentType && contentType.includes("application/json")) {
+      result = await res.json();
+    } else {
+      result = { message: await res.text() }; // fallback plain text
+    }
+
+    if (statusElem) statusElem.innerText = "✅ Upload complete!";
+    alert("✅ Upload successful!");
+    console.log("Upload result:", result);
+    renderBackendResult(result); // Optional
+  } catch (err) {
+    console.error("Upload error:", err);
+    showError("❌ Upload failed: " + err.message);
+    if (statusElem) statusElem.innerText = "❌ Upload failed";
+  }
+}
+
+function renderBackendResult(result) {
+  const skipped = result.skippedRowsList;
+  if (!Array.isArray(skipped) || skipped.length === 0) return;
+
+  const table = document.createElement("table");
+  // In renderBackendResult:
+  table.innerHTML = `
     <thead>
-      <tr>
-        <th>Category</th>
-        <th>Subcategories</th>
-        <th>Products</th>
-        <th>Remove</th>
-      </tr>
+        <tr>
+            <th>Row</th>
+            <th>Issue</th>
+            <th>Suggested Fix</th>
+        </tr>
     </thead>
-    <tbody>${bodyRows}</tbody>`;
+    <tbody>
+        ${skipped
+          .map(
+            (row) => `
+            <tr>
+                <td>${row.rowNumber}</td>
+                <td>${row.reason.split("(")[0]}</td>
+                <td>${
+                  row.reason.includes("ProductVariantsMap")
+                    ? 'Convert to JSON format (e.g., {"size":["XL"]})'
+                    : "Check required fields"
+                }</td>
+            </tr>
+        `
+          )
+          .join("")}
+    </tbody>`;
+  const div = document.getElementById("error-container");
+  div.innerHTML = `<strong>⚠️ Skipped Rows:</strong>`;
+  div.appendChild(table);
+  // In renderBackendResult:
+  if (result.message) {
+    const msgDiv = document.createElement("div");
+    msgDiv.textContent = result.message;
+    document.getElementById("error-container").appendChild(msgDiv);
+  }
 }
 
-/* ---------------------- Remove category row ------------------------ */
-function removeCategory(index) {
-  structuredData.splice(index, 1);
-  renderPreview();
-}
-
-/* ---------------------------- CSV loader --------------------------- */
 document.getElementById("csvInput").addEventListener("change", (e) => {
   const file = e.target.files[0];
-  if (!file) return;
+  if (!file) {
+    showError("No file selected");
+    return;
+  }
 
   const isCSV = file.type === "text/csv" || file.name.endsWith(".csv");
   if (!isCSV) {
     showError("❌ Only CSV file allowed");
-    structuredData = [];
-    document.getElementById("previewTable").innerHTML = "";
-    fileSelected = false;
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    showError("❌ File too large (max 10MB)");
     return;
   }
 
@@ -179,86 +448,16 @@ document.getElementById("csvInput").addEventListener("change", (e) => {
     complete: (res) => {
       fileSelected = true;
       handleCSVData(res.data);
+      uploadCSVFile(file); // 👈 Add this line
     },
   });
 });
-
-/* ----------------------------- Autofill ---------------------------- */
-function autofillForms() {
-  if (!fileSelected || structuredData.length === 0) {
+function submitBulkData() {
+  const fileInput = document.getElementById("csvInput");
+  if (!fileInput.files || fileInput.files.length === 0) {
     showError("❌ Please select a CSV file first");
     return;
   }
-  localStorage.setItem("autofillData", JSON.stringify(structuredData));
-  window.location.href = "Category.html";
+  // Trigger the file processing
+  fileInput.dispatchEvent(new Event("change"));
 }
-
-/* -------------------------- Bulk submit ---------------------------- */
-async function submitBulkData() {
-  if (!fileSelected || structuredData.length === 0) {
-    showError("❌ Please select a CSV file first");
-    return;
-  }
-
-  try {
-    for (const cat of structuredData) {
-      const savedCat = await postJSON(CAT_URL, {
-        name: cat.name,
-        description: cat.description,
-        searchkeywords: cat.searchkeywords,
-        imagelink: cat.imagelink,
-        seotitle: cat.seotitle,
-        seokeywords: cat.seokeywords,
-        seodescription: cat.seodescription,
-        published: cat.published,
-      });
-      const catId = savedCat.id;
-
-      for (const sub of cat.subcategories) {
-        const savedSub = await postJSON(SUB_URL, {
-          name: sub.name,
-          imagepath: sub.imagepath,
-          metatitle: sub.metatitle,
-          ispublished: sub.ispublished,
-          description: sub.description,
-          metadescription: sub.metadescription,
-          seokeywords: sub.seokeywords,
-          categoryIds: [catId],
-        });
-        const subId = savedSub.id;
-
-        for (const prod of sub.products) {
-          await postJSON(PROD_URL, {
-            name: prod.name,
-            description: prod.description,
-            mainimage: prod.mainimage,
-            producttags: prod.producttags,
-            filter: prod.filter,
-            metatitle: prod.metatitle,
-            metadescription: prod.metadescription,
-            pagekeywords: prod.pagekeywords,
-            ispublished: prod.ispublished,
-            variantsMap: JSON.stringify(prod.variantsMap),
-            subcategoryIds: [subId],
-          });
-        }
-      }
-    }
-
-    alert("✅ All data created successfully!");
-  } catch (err) {
-    console.error(err);
-    alert("❌ Operation failed: " + err.message);
-  }
-}
-
-/* ---------------------------- helpers ------------------------------ */
-const postJSON = (url, obj) =>
-  fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(obj),
-  }).then((r) => {
-    if (!r.ok) throw new Error(`${url} → ${r.status}`);
-    return r.json();
-  });
