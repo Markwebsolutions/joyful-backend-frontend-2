@@ -13,37 +13,58 @@
 
   <title>Categories</title>
 </head>
-<body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="Dashboard.html" class="logo">AdminPanel</a>
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="Category.html">Category</a></li>
-                <li class="nav-item"><a href="subcategory.html">Sub-Category</a></li>
-                <li class="nav-item"><a href="product.html">Products</a></li>
 
-                <li class="nav-item">
-                    <a href="csvupload.html">Upload CSV</a>
-                </li>
-                <li class="nav-item">
-                    <a href="productenquiry.html">Product Enquiry</a>
-                </li>
-                <li class="nav-item">
-                    <a href="GeneralEnquiry.html">General Enquiry</a>
-                </li>
-                <li class="nav-item">
-                    <button class="logout" onclick="logout()">Logout</button>
-                </li>
-            </ul>
-        </div>
-    </nav>
-  <div class="top-bar container">
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="Dashboard.html" class="logo">AdminPanel</a>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="Category.html">Category</a></li>
+        <li class="nav-item"><a href="subcategory.html">Sub-Category</a></li>
+        <li class="nav-item"><a href="product.html">Products</a></li>
+
+        <li class="nav-item">
+          <a href="csvupload.html">Upload CSV</a>
+        </li>
+        <li class="nav-item">
+          <a href="productenquiry.html">Product Enquiry</a>
+        </li>
+        <li class="nav-item">
+          <a href="GeneralEnquiry.html">General Enquiry</a>
+        </li>
+        <li class="nav-item">
+          <button class="logout" onclick="logout()">Logout</button>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <!-- <div class="top-bar container">
     <h1 class="headings">Category Dashboard</h1>
+
+    <div style="margin-bottom: 20px;">
+      <input type="text" id="searchInput" placeholder="Search Category" onkeyup="searchCategory()"
+        class="search-input" />
+    </div>
+
     <div class="top-controls">
       <button class="add-btn" onclick="openAddModal()">
         <i class="fas fa-plus"></i> + Add Category
       </button>
+      <div id="categoryCount" class="category-count">Total Category: 0</div>
+    </div>
+  </div> -->
+  <div class="top-bar container">
+    <h1 class="headings">Category Dashboard</h1>
+
+    <div class="top-controls">
+      <input type="text" id="searchInput" placeholder="Search Category" onkeyup="searchCategory()"
+        class="search-input" />
+
+      <button class="add-btn" onclick="openAddModal()">
+        <i class="fas fa-plus"></i> + Add Category
+      </button>
+
       <div id="categoryCount" class="category-count">Total Category: 0</div>
     </div>
   </div>
@@ -217,6 +238,7 @@
   </div>
 
   <script src="./Logout.js"></script>
+  <script src="global.js"></script>
   <script src="./category.js"></script>
 </body>
 

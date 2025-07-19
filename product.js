@@ -1,5 +1,7 @@
-const baseUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/products";
-const subcategoryUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/subcategories";
+const baseUrl =
+  "https://joyful-backend-backend-final-4-production.up.railway.app/products";
+const subcategoryUrl =
+  "https://joyful-backend-backend-final-4-production.up.railway.app/subcategories";
 
 async function loadProducts() {
   try {
@@ -72,3 +74,21 @@ async function deleteProduct(id) {
 }
 
 loadProducts();
+function searchProduct() {
+  const input = document
+    .getElementById("searchProductInput")
+    .value.toLowerCase();
+  const tableBody = document.getElementById("productTableBody");
+  const rows = tableBody.getElementsByTagName("tr");
+
+  for (let i = 0; i < rows.length; i++) {
+    const nameCell = rows[i].getElementsByTagName("td")[0]; // Product name is in first column
+    const nameText = nameCell?.textContent.toLowerCase() || "";
+
+    if (nameText.includes(input)) {
+      rows[i].style.display = "";
+    } else {
+      rows[i].style.display = "none";
+    }
+  }
+}

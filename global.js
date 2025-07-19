@@ -82,3 +82,20 @@ loadSubcategoryCount();
 loadProductCount();
 loadEnquiryCount();
 loadGeneralEnquiryCount();
+
+function searchCategory() {
+  const input = document.getElementById("searchInput").value.toLowerCase();
+  const tableBody = document.getElementById("categoryTableBody");
+  const rows = tableBody.getElementsByTagName("tr");
+
+  for (let i = 0; i < rows.length; i++) {
+    const nameCell = rows[i].getElementsByTagName("td")[0]; // Assuming first column is 'Name'
+    const nameText = nameCell?.textContent.toLowerCase() || "";
+
+    if (nameText.includes(input)) {
+      rows[i].style.display = ""; // Show matching row
+    } else {
+      rows[i].style.display = "none"; // Hide non-matching row
+    }
+  }
+}

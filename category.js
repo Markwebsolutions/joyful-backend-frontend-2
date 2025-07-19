@@ -1,14 +1,9 @@
-const baseUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/categories";
+const baseUrl =
+  "https://joyful-backend-backend-final-4-production.up.railway.app/categories";
 const categoryMap = new Map(); // Stores id -> category object
 let addQuill;
 let editQuill;
 
-// function previewImage() {
-//   const imageUrl = document.getElementById("addImageLink").value;
-//   const preview = document.getElementById("imagePreview");
-//   preview.style.display = imageUrl.trim() ? "block" : "none";
-//   preview.src = imageUrl.trim();
-// }
 function previewImage() {
   const input = document.getElementById("addImageLink");
   const preview = document.getElementById("imagePreview");

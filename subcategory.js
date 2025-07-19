@@ -1,5 +1,7 @@
-const baseUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/subcategories";
-const categoryUrl = "https://joyful-backend-backend-final-4-production.up.railway.app/categories";
+const baseUrl =
+  "https://joyful-backend-backend-final-4-production.up.railway.app/subcategories";
+const categoryUrl =
+  "https://joyful-backend-backend-final-4-production.up.railway.app/categories";
 
 const subcategoryMap = new Map(); // Store subcategories
 let allCategories = []; // Store loaded category list
@@ -279,5 +281,23 @@ async function deleteSubcategory(id) {
   } catch (err) {
     console.error("Delete failed:", err);
     showCustomAlert("Failed to connect to the server.");
+  }
+}
+function searchSubcategory() {
+  const input = document
+    .getElementById("searchSubcategoryInput")
+    .value.toLowerCase();
+  const tableBody = document.getElementById("subcategoryTableBody");
+  const rows = tableBody.getElementsByClassName("grid-row");
+
+  for (let i = 0; i < rows.length; i++) {
+    const nameDiv = rows[i].children[0]; // First child div contains the name
+    const nameText = nameDiv?.textContent.toLowerCase() || "";
+
+    if (nameText.includes(input)) {
+      rows[i].style.display = "grid"; // Keep as grid
+    } else {
+      rows[i].style.display = "none"; // Hide if doesn't match
+    }
   }
 }

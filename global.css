@@ -166,9 +166,25 @@ body {
 .top-controls {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 2rem; /* Space between search, button, count */
 }
 
+/* Search Input Styling */
+.search-input {
+  padding: 10px 14px;
+  height: 44px; /* Match button height */
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  box-sizing: border-box;
+}
+
+.search-input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
 .add-btn {
   padding: 0.75rem 1.5rem;
   background: linear-gradient(
