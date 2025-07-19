@@ -307,8 +307,9 @@ function handleCSVData(csvRows) {
       metatitle: r.ProductMetaTitle,
       metadescription: r.ProductMetaDesc,
       pagekeywords: r.ProductKeywords,
-      ispublished: r.ProductPublished.toLowerCase() !== "false",
-
+      ispublished: ["yes", "true", "1"].includes(
+        r.ProductPublished.toLowerCase()
+      ),
       variantsMap: variantsMap, // Just store the string value
     });
   }
