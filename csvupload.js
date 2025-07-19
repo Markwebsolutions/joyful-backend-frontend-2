@@ -355,8 +355,7 @@ async function uploadCSVFile(file) {
   if (statusElem) statusElem.innerText = "⏳ Uploading...";
 
   try {
-    const res = await fetch(
-      "https://joyful-backend-backend-final-4-production.up.railway.app/upload-csv",
+    const res = await fetch("https://joyful-backend-backend-final-4-production.up.railway.app/upload-csv",
       {
         method: "POST",
         body: formData,
