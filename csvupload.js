@@ -125,7 +125,7 @@ function handleCSVData(csvRows) {
         seotitle: r.CategorySeoTitle,
         seokeywords: r.CategorySeoKeywords,
         seodescription: r.CategorySeoDesc,
-        published: r.CategoryPublished.toLowerCase() !== "false",
+        published: r.CategoryPublished.toLowerCase() === "yes",
         subcategories: [],
       };
       structuredData.push(cat);
@@ -137,7 +137,7 @@ function handleCSVData(csvRows) {
         name: r.SubcategoryName,
         imagepath: r.SubcategoryImage,
         metatitle: r.SubcategoryMetaTitle,
-        ispublished: r.SubcategoryPublished.toLowerCase() !== "false",
+        ispublished: r.SubcategoryPublished.toLowerCase() === "yes",
         description: r.SubcategoryDesc,
         metadescription: r.SubcategoryMetaDesc,
         seokeywords: r.SubcategoryKeywords,
@@ -157,7 +157,7 @@ function handleCSVData(csvRows) {
       metatitle: r.ProductMetaTitle,
       metadescription: r.ProductMetaDesc,
       pagekeywords: r.ProductKeywords,
-      ispublished: r.ProductPublished.toLowerCase() !== "false",
+      ispublished: r.ProductPublished.toLowerCase() === "yes",
       variantsMap: variantsMap,
       _hasInvalidVariants: hasInvalidVariants, // Flag for rendering
     });
@@ -355,7 +355,8 @@ async function uploadCSVFile(file) {
   if (statusElem) statusElem.innerText = "⏳ Uploading...";
 
   try {
-    const res = await fetch("https://joyful-backend-backend-final-4-production.up.railway.app/upload-csv",
+    const res = await fetch(
+      "https://joyful-backend-backend-final-4-production.up.railway.app/upload-csv",
       {
         method: "POST",
         body: formData,
