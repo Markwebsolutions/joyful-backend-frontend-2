@@ -16,7 +16,7 @@ function submitBulkData() {
       if (!validateCSVFields(rows)) return;
 
       fetch(
-        "https://joyful-backend-backend-final-4-production.up.railway.app/import",
+        "https://joyful-backend-backend-final-4-production.up.railway.app/api/csv/import",
         {
           method: "POST",
           headers: {
@@ -123,11 +123,14 @@ function handleSubmit() {
         '<span style="color: var(--accent-primary)"> Uploading...</span>';
 
       // Submit to backend
-      fetch("https://joyful-backend-backend-final-4-production.up.railway.app/import", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(rows),
-      })
+      fetch(
+        "https://joyful-backend-backend-final-4-production.up.railway.app/api/csv/import",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(rows),
+        }
+      )
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {
