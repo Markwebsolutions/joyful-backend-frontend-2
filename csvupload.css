@@ -16,6 +16,11 @@
   --danger-color: #ef4444;
   --warning-color: #f59e0b;
 }
+html,
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
 
 a {
   text-decoration: none;

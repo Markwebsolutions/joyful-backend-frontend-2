@@ -1,467 +1,152 @@
-// Updated csvupload.js with field validation, file size checks, error logging, and progress bar
+function submitBulkData() {
+  const fileInput = document.getElementById("csvInput");
+  const file = fileInput.files[0];
 
-let structuredData = [];
-let fileSelected = false;
-let csvErrors = [];
-
-function showError(message) {
-  const existing = document.getElementById("error-popup");
-  if (existing) existing.remove();
-
-  const div = document.createElement("div");
-  div.id = "error-popup";
-  div.textContent = message;
-  div.style.cssText = `
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #ffe0e0;
-    padding: 16px 24px;
-    border: 2px solid red;
-    border-radius: 8px;
-    font-size: 18px;
-    z-index: 1000;
-  `;
-  document.body.appendChild(div);
-  setTimeout(() => div.remove(), 3000);
-}
-
-function showCSVErrors() {
-  if (!csvErrors.length) return;
-  const table = document.createElement("table");
-  table.style.cssText =
-    "border-collapse: collapse; margin-top: 10px; background: #fff; border: 1px solid #ccc;";
-  table.innerHTML = `
-    <thead><tr><th style='padding: 6px; border: 1px solid #ccc;'>Row</th><th style='padding: 6px; border: 1px solid #ccc;'>Issue</th></tr></thead>
-    <tbody>
-      ${csvErrors
-        .map(
-          (e) =>
-            `<tr><td style='padding: 6px; border: 1px solid #ccc;'>${e.row}</td><td style='padding: 6px; border: 1px solid #ccc;'>${e.issue}</td></tr>`
-        )
-        .join("")}
-    </tbody>`;
-  const div = document.getElementById("error-container");
-  div.innerHTML = `<strong>⚠️ Skipped Rows:</strong>`;
-  div.appendChild(table);
-}
-
-function isTruthy(value) {
-  return value != null && String(value).trim().length > 0;
-}
-function handleCSVData(csvRows) {
-  structuredData = [];
-  csvErrors = [];
-  renderPreview(); // Clear existing preview
-
-  const header = csvRows[0];
-  const mandatoryFields = [
-    "CategoryName",
-    "CategoryDesc",
-    "CategorySearch",
-    "CategoryImage",
-    "CategorySeoTitle",
-    "CategorySeoKeywords",
-    "CategorySeoDesc",
-    "CategoryPublished",
-    "SubcategoryName",
-    "SubcategoryImage",
-    "SubcategoryMetaTitle",
-    "SubcategoryPublished",
-    "SubcategoryDesc",
-    "SubcategoryMetaDesc",
-    "SubcategoryKeywords",
-    "ProductName",
-    "ProductDesc",
-    "ProductImage",
-    "ProductTags",
-    "ProductFilter",
-    "ProductMetaTitle",
-    "ProductMetaDesc",
-    "ProductKeywords",
-    "ProductPublished",
-  ];
-
-  for (let i = 1; i < csvRows.length; i++) {
-    const row = csvRows[i];
-    if (!row || row.length === 0 || row.every((cell) => !cell.trim())) continue;
-
-    const r = {};
-    header.forEach((h, j) => (r[h.trim()] = (row[j] || "").trim()));
-
-    const missing = mandatoryFields.filter((f) => !isTruthy(r[f]));
-    if (missing.length) {
-      csvErrors.push({
-        row: i + 1,
-        issue: `Missing fields: ${missing.join(", ")}`,
-      });
-      continue;
-    }
-
-    // Validate ProductVariantsMap
-    const variantsMap = r.ProductVariantsMap || "{}";
-    let hasInvalidVariants = false;
-
-    if (variantsMap.trim() !== "" && variantsMap !== "{}") {
-      try {
-        JSON.parse(variantsMap);
-      } catch (e) {
-        csvErrors.push({
-          row: i + 1,
-          issue: `Invalid ProductVariantsMap format - must be valid JSON (e.g., {"color":["red"]})`,
-        });
-        hasInvalidVariants = true;
-      }
-    }
-
-    let cat = structuredData.find((c) => c.name === r.CategoryName);
-    if (!cat) {
-      cat = {
-        name: r.CategoryName,
-        description: r.CategoryDesc,
-        searchkeywords: r.CategorySearch,
-        imagelink: r.CategoryImage,
-        seotitle: r.CategorySeoTitle,
-        seokeywords: r.CategorySeoKeywords,
-        seodescription: r.CategorySeoDesc,
-        published: r.CategoryPublished.toLowerCase() === "yes",
-        subcategories: [],
-      };
-      structuredData.push(cat);
-    }
-
-    let sub = cat.subcategories.find((s) => s.name === r.SubcategoryName);
-    if (!sub) {
-      sub = {
-        name: r.SubcategoryName,
-        imagepath: r.SubcategoryImage,
-        metatitle: r.SubcategoryMetaTitle,
-        ispublished: r.SubcategoryPublished.toLowerCase() === "yes",
-        description: r.SubcategoryDesc,
-        metadescription: r.SubcategoryMetaDesc,
-        seokeywords: r.SubcategoryKeywords,
-        products: [],
-      };
-      cat.subcategories.push(sub);
-    }
-
-    sub.products.push({
-      name: r.ProductName,
-      description: r.ProductDesc,
-      mainimage: r.ProductImage,
-      producttags: r.ProductTags.split(/[,;]/)
-        .map((t) => t.trim())
-        .filter(Boolean),
-      filter: r.ProductFilter,
-      metatitle: r.ProductMetaTitle,
-      metadescription: r.ProductMetaDesc,
-      pagekeywords: r.ProductKeywords,
-      ispublished: r.ProductPublished.toLowerCase() === "yes",
-      variantsMap: variantsMap,
-      _hasInvalidVariants: hasInvalidVariants, // Flag for rendering
-    });
-  }
-
-  renderPreview();
-  showCSVErrors();
-}
-
-function renderPreview() {
-  const previewDiv = document.getElementById("preview");
-  if (!previewDiv) return;
-
-  previewDiv.innerHTML = ""; // clear old content
-
-  structuredData.forEach((cat) => {
-    const catDiv = document.createElement("div");
-    catDiv.innerHTML = `<h3>Category: ${cat.name}</h3>`;
-
-    cat.subcategories.forEach((sub) => {
-      const subDiv = document.createElement("div");
-      subDiv.innerHTML = `<h4>Subcategory: ${sub.name}</h4><ul>`;
-
-      sub.products.forEach((prod) => {
-        const li = document.createElement("li");
-        li.textContent = `Product: ${prod.name} - ${prod.description}`;
-
-        if (prod._hasInvalidVariants) {
-          li.style.color = "orange";
-          li.textContent += " (⚠️ Check variants format)";
-        }
-
-        subDiv.querySelector("ul").appendChild(li);
-      });
-
-      catDiv.appendChild(subDiv);
-    });
-
-    previewDiv.appendChild(catDiv);
-  });
-}
-
-function handleCSVData(csvRows) {
-  structuredData = [];
-  csvErrors = [];
-  renderPreview(); // Just clear preview
-
-  const header = csvRows[0];
-  const mandatoryFields = [
-    "CategoryName",
-    "CategoryDesc",
-    "CategorySearch",
-    "CategoryImage",
-    "CategorySeoTitle",
-    "CategorySeoKeywords",
-    "CategorySeoDesc",
-    "CategoryPublished",
-    "SubcategoryName",
-    "SubcategoryImage",
-    "SubcategoryMetaTitle",
-    "SubcategoryPublished",
-    "SubcategoryDesc",
-    "SubcategoryMetaDesc",
-    "SubcategoryKeywords",
-    "ProductName",
-    "ProductDesc",
-    "ProductImage",
-    "ProductTags",
-    "ProductFilter",
-    "ProductMetaTitle",
-    "ProductMetaDesc",
-    "ProductKeywords",
-    "ProductPublished",
-  ];
-
-  for (let i = 1; i < csvRows.length; i++) {
-    const row = csvRows[i];
-    if (!row || row.length === 0 || row.every((cell) => !cell.trim())) continue;
-
-    const r = {};
-    header.forEach((h, j) => (r[h.trim()] = (row[j] || "").trim()));
-
-    const missing = mandatoryFields.filter((f) => !isTruthy(r[f]));
-    if (missing.length) {
-      csvErrors.push({
-        row: i + 1,
-        issue: `Missing fields: ${missing.join(", ")}`,
-      });
-      continue;
-    }
-
-    // Validate ProductVariantsMap
-    const variantsMap = r.ProductVariantsMap || "{}";
-    let hasInvalidVariants = false;
-
-    if (variantsMap.trim() !== "" && variantsMap !== "{}") {
-      try {
-        JSON.parse(variantsMap);
-      } catch (e) {
-        csvErrors.push({
-          row: i + 1,
-          issue: `Invalid ProductVariantsMap format - must be valid JSON (e.g., {"color":["red"]})`,
-        });
-        hasInvalidVariants = true;
-      }
-    }
-
-    let cat = structuredData.find((c) => c.name === r.CategoryName);
-    if (!cat) {
-      cat = {
-        name: r.CategoryName,
-        description: r.CategoryDesc,
-        searchkeywords: r.CategorySearch,
-        imagelink: r.CategoryImage,
-        seotitle: r.CategorySeoTitle,
-        seokeywords: r.CategorySeoKeywords,
-        seodescription: r.CategorySeoDesc,
-        published: r.CategoryPublished.toLowerCase() !== "false",
-        subcategories: [],
-      };
-      structuredData.push(cat);
-    }
-
-    let sub = cat.subcategories.find((s) => s.name === r.SubcategoryName);
-    if (!sub) {
-      sub = {
-        name: r.SubcategoryName,
-        imagepath: r.SubcategoryImage,
-        metatitle: r.SubcategoryMetaTitle,
-        ispublished: r.SubcategoryPublished.toLowerCase() !== "false",
-        description: r.SubcategoryDesc,
-        metadescription: r.SubcategoryMetaDesc,
-        seokeywords: r.SubcategoryKeywords,
-        products: [],
-      };
-      cat.subcategories.push(sub);
-    }
-
-    sub.products.push({
-      name: r.ProductName,
-      description: r.ProductDesc,
-      mainimage: r.ProductImage,
-      producttags: r.ProductTags.split(/[,;]/)
-        .map((t) => t.trim())
-        .filter(Boolean),
-      filter: r.ProductFilter,
-      metatitle: r.ProductMetaTitle,
-      metadescription: r.ProductMetaDesc,
-      pagekeywords: r.ProductKeywords,
-      ispublished: ["yes", "true", "1"].includes(
-        r.ProductPublished.toLowerCase()
-      ),
-      variantsMap: variantsMap, // Just store the string value
-    });
-  }
-
-  renderPreview();
-  showCSVErrors();
-}
-async function postJSON(url, data) {
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) {
-    const errorBody = await res.text();
-    throw new Error(
-      `POST ${url} failed with status ${res.status}: ${errorBody}`
-    );
-  }
-
-  return res.json(); // return saved object (e.g. category with `id`)
-}
-
-async function uploadCSVFile(file) {
-  const formData = new FormData();
-  formData.append("file", file);
-  // In uploadCSVFile:
-  const invalidRows = csvErrors.filter((e) =>
-    e.issue.includes("ProductVariantsMap")
-  );
-  if (invalidRows.length > 0) {
-    if (
-      !confirm(
-        `${invalidRows.length} products have variant format issues. Continue anyway?`
-      )
-    ) {
-      return;
-    }
-  }
-  const statusElem = document.getElementById("uploadStatus");
-  if (statusElem) statusElem.innerText = "⏳ Uploading...";
-
-  try {
-    const res = await fetch(
-      "https://joyful-backend-backend-final-4-production.up.railway.app/upload-csv",
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error("Upload failed: " + errorText);
-    }
-
-    // Safely handle empty or non-JSON responses
-    const contentType = res.headers.get("content-type");
-    let result = null;
-    if (contentType && contentType.includes("application/json")) {
-      result = await res.json();
-    } else {
-      result = { message: await res.text() }; // fallback plain text
-    }
-
-    if (statusElem) statusElem.innerText = "✅ Upload complete!";
-    alert("✅ Upload successful!");
-    console.log("Upload result:", result);
-    renderBackendResult(result); // Optional
-  } catch (err) {
-    console.error("Upload error:", err);
-    showError("❌ Upload failed: " + err.message);
-    if (statusElem) statusElem.innerText = "❌ Upload failed";
-  }
-}
-
-function renderBackendResult(result) {
-  const skipped = result.skippedRowsList;
-  if (!Array.isArray(skipped) || skipped.length === 0) return;
-
-  const table = document.createElement("table");
-  // In renderBackendResult:
-  table.innerHTML = `
-    <thead>
-        <tr>
-            <th>Row</th>
-            <th>Issue</th>
-            <th>Suggested Fix</th>
-        </tr>
-    </thead>
-    <tbody>
-        ${skipped
-          .map(
-            (row) => `
-            <tr>
-                <td>${row.rowNumber}</td>
-                <td>${row.reason.split("(")[0]}</td>
-                <td>${
-                  row.reason.includes("ProductVariantsMap")
-                    ? 'Convert to JSON format (e.g., {"size":["XL"]})'
-                    : "Check required fields"
-                }</td>
-            </tr>
-        `
-          )
-          .join("")}
-    </tbody>`;
-  const div = document.getElementById("error-container");
-  div.innerHTML = `<strong>⚠️ Skipped Rows:</strong>`;
-  div.appendChild(table);
-  // In renderBackendResult:
-  if (result.message) {
-    const msgDiv = document.createElement("div");
-    msgDiv.textContent = result.message;
-    document.getElementById("error-container").appendChild(msgDiv);
-  }
-}
-
-document.getElementById("csvInput").addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  if (!file) {
-    showError("No file selected");
-    return;
-  }
-
-  const isCSV = file.type === "text/csv" || file.name.endsWith(".csv");
-  if (!isCSV) {
-    showError("❌ Only CSV file allowed");
-    return;
-  }
-  if (file.size > 10 * 1024 * 1024) {
-    showError("❌ File too large (max 10MB)");
+  if (!file || !file.name.endsWith(".csv")) {
+    alert("Please select a valid .csv file.");
     return;
   }
 
   Papa.parse(file, {
-    complete: (res) => {
-      fileSelected = true;
-      handleCSVData(res.data);
-      uploadCSVFile(file); // 👈 Add this line
+    header: true,
+    skipEmptyLines: true,
+    complete: function (results) {
+      const rows = results.data;
+
+      if (!validateCSVFields(rows)) return;
+
+      fetch("http://localhost:8080/api/csv/import", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(rows),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            alert(`✅ Import Success: ${data.message}`);
+          } else {
+            alert(`⚠️ Import Failed: ${data.message}`);
+          }
+        })
+        .catch((error) => {
+          console.error("Error during upload:", error);
+          alert("❌ Upload failed. Check console or server logs.");
+        });
     },
   });
-});
-function submitBulkData() {
+}
+
+// Utility function to validate required fields
+function validateCSVFields(rows) {
+  const requiredFields = [
+    "category_name",
+    "category_description",
+    "category_searchkeywords",
+    "category_imagelink",
+    "category_seotitle",
+    "category_seokeywords",
+    "category_seodescription",
+    "category_ispublished",
+    "subcategory_name",
+    "subcategory_imagepath",
+    "subcategory_metatitle",
+    "subcategory_ispublished",
+    "subcategory_description",
+    "subcategory_metadescription",
+    "subcategory_seokeywords",
+    "product_name",
+    "product_description",
+    "product_mainimage",
+    "product_hoverimage",
+    "product_producttags",
+    "product_filter",
+    "product_metatitle",
+    "product_metadescription",
+    "product_pagekeywords",
+    "product_ispublished",
+    "product_newarrival",
+    "product_variantsMap",
+  ];
+
+  const missingFields = requiredFields.filter(
+    (field) => !Object.keys(rows[0]).includes(field)
+  );
+
+  if (missingFields.length > 0) {
+    alert("❌ Missing required fields in CSV: " + missingFields.join(", "));
+    return false;
+  }
+
+  return true;
+}
+function handleSubmit() {
   const fileInput = document.getElementById("csvInput");
-  if (!fileInput.files || fileInput.files.length === 0) {
-    showError("❌ Please select a CSV file first");
+  const file = fileInput.files[0];
+  const status = document.getElementById("status");
+  const table = document.getElementById("previewTable");
+  const tbody = document.getElementById("previewBody");
+
+  if (!file || !file.name.endsWith(".csv")) {
+    status.innerHTML =
+      '<span style="color: var(--danger-color)"> Please select a valid .csv file.</span>';
     return;
   }
-  // Trigger the file processing
-  fileInput.dispatchEvent(new Event("change"));
+
+  status.innerHTML =
+    '<span style="color: var(--warning-color)"> Reading file...</span>';
+
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: function (results) {
+      const rows = results.data;
+
+      // Show preview table
+      tbody.innerHTML = "";
+      rows.forEach((row) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row["category_name"] || "-"}</td>
+          <td>${row["subcategory_name"] || "-"}</td>
+          <td>${row["product_name"] || "-"}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      table.style.display = "table";
+      status.innerHTML =
+        '<span style="color: var(--accent-primary)"> Uploading...</span>';
+
+      // Submit to backend
+      fetch("http://localhost:8080/api/csv/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(rows),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            status.innerHTML = `<span style="color: var(--success-color)"> ${data.message}</span>`;
+          } else {
+            status.innerHTML = `<span style="color: var(--danger-color)"> ${data.message}</span>`;
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          status.innerHTML =
+            '<span style="color: var(--danger-color)">🚫 Upload failed. Check server.</span>';
+        });
+    },
+  });
+}
+function displayFileName() {
+  const input = document.getElementById("csvInput");
+  const fileNameSpan = document.getElementById("fileName");
+  if (input.files.length > 0) {
+    fileNameSpan.textContent = `Selected File: ${input.files[0].name}`;
+  } else {
+    fileNameSpan.textContent = "";
+  }
 }

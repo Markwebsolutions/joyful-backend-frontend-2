@@ -18,60 +18,47 @@
                 <li class="nav-item"><a href="Category.html">Category</a></li>
                 <li class="nav-item"><a href="subcategory.html">Sub-Category</a></li>
                 <li class="nav-item"><a href="product.html">Products</a></li>
-
-                <li class="nav-item">
-                    <a href="csvupload.html">Upload CSV</a>
-                </li>
-                <li class="nav-item">
-                    <a href="productenquiry.html">Product Enquiry</a>
-                </li>
-                <li class="nav-item">
-                    <a href="GeneralEnquiry.html">General Enquiry</a>
-                </li>
-                <li class="nav-item">
-                    <button class="logout" onclick="logout()">Logout</button>
-                </li>
+                <li class="nav-item"><a href="csvupload.html">Upload CSV</a></li>
+                <li class="nav-item"><a href="productenquiry.html">Product Enquiry</a></li>
+                <li class="nav-item"><a href="GeneralEnquiry.html">General Enquiry</a></li>
+                <li class="nav-item"><button class="logout" onclick="logout()">Logout</button></li>
             </ul>
         </div>
     </nav>
-    <div class="csvuploader">
-        <div class="upload-btn">
-            <label for="csvInput" class="file-label"> Choose CSV File</label>
-            <input type="file" id="csvInput" accept=".csv" />
 
-            <div class="button-group">
+    <body>
+        <!-- Navigation Bar (same as before) -->
 
-                <button
-                    onclick="if(!document.getElementById('csvInput').files.length) { alert('Please select a file first'); return false; } submitBulkData()">
-                    Submit All
-                </button>
+        <div class="csvuploader show-table">
+            <div class="upload-btn">
+                <label for="csvInput" class="file-label">Choose CSV File</label>
+                <input type="file" id="csvInput" accept=".csv" onchange="displayFileName()" />
+                <span id="fileName" style="font-size: 0.85rem; color: var(--text-secondary);"></span>
+
+                <div class="button-group">
+                    <button onclick="handleSubmit()">Submit All</button>
+                </div>
+                <div id="status" style="margin-top: 10px;"></div>
             </div>
         </div>
-    </div>
-    <!-- ⬇️ Add this below the button group -->
-    <div id="uploadStatus" style="margin-top: 10px; font-weight: bold; color: #444;"></div>
-    </div>
-    <div class="show-table">
-        <table id="previewTable" class="preview-table"></table>
-    </div>
 
-    <!-- Progress Indicator -->
-    <div class="progress-container" id="progressContainer">
-        <div class="progress-bar" id="progressBar"></div>
-    </div>
-    </div>
+        <!-- Table Preview -->
+        <table id="previewTable" class="preview-table" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Category Name</th>
+                    <th>Subcategory Name</th>
+                    <th>Product Name</th>
+                </tr>
+            </thead>
+            <tbody id="previewBody"></tbody>
+        </table>
 
-    <div class="show-table">
-        <table id="previewTable" class="preview-table"></table>
-    </div>
+        <!-- Scripts -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+        <script src="Logout.js"></script>
+        <script src="csvupload.js"></script>
+    </body>
 
-    <!-- Error Messages -->
-    <div id="error-container"></div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="Logout.js"></script>
-    <script src="csvupload.js"></script>
-
-</body>
 
 </html>
