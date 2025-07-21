@@ -123,7 +123,7 @@ function handleSubmit() {
         '<span style="color: var(--accent-primary)"> Uploading...</span>';
 
       // Submit to backend
-      fetch("http://localhost:8080/api/csv/import", {
+      fetch("https://joyful-backend-backend-final-4-production.up.railway.app/import", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(rows),
