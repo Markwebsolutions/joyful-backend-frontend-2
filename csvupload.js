@@ -15,13 +15,16 @@ function submitBulkData() {
 
       if (!validateCSVFields(rows)) return;
 
-      fetch("http://localhost:8080/api/csv/import", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(rows),
-      })
+      fetch(
+        "https://joyful-backend-backend-final-4-production.up.railway.app/import",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(rows),
+        }
+      )
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
