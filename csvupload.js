@@ -100,29 +100,66 @@ function handleSubmit() {
   status.innerHTML =
     '<span style="color: var(--warning-color)"> Reading file...</span>';
 
+  // Papa.parse(file, {
+  //   header: true,
+  //   skipEmptyLines: true,
+  //   complete: function (results) {
+  //     const rows = results.data;
+
+  //     // Show preview table
+  //     tbody.innerHTML = "";
+  //     rows.forEach((row) => {
+  //       const tr = document.createElement("tr");
+  //       tr.innerHTML = `
+  //         <td>${row["category_name"] || "-"}</td>
+  //         <td>${row["subcategory_name"] || "-"}</td>
+  //         <td>${row["product_name"] || "-"}</td>
+  //       `;
+  //       tbody.appendChild(tr);
+  //     });
+
+  //     table.style.display = "table";
+  //     status.innerHTML =
+  //       '<span style="color: var(--accent-primary)"> Uploading...</span>';
+
+  //     // Submit to backend
+  //     fetch(
+  //       "https://joyful-backend-backend-final-4-production.up.railway.app/api/csv/import",
+  //       {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify(rows),
+  //       }
+  //     )
+  //       .then((res) => res.json())
+  //       .then((data) => {
+  //         if (data.success) {
+  //           status.innerHTML = `<span style="color: var(--success-color)"> ${data.message}</span>`;
+  //         } else {
+  //           status.innerHTML = `<span style="color: var(--danger-color)"> ${data.message}</span>`;
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.error(err);
+  //         status.innerHTML =
+  //           '<span style="color: var(--danger-color)">🚫 Upload failed. Check server.</span>';
+  //       });
+  //   },
+  // });
   Papa.parse(file, {
     header: true,
     skipEmptyLines: true,
     complete: function (results) {
       const rows = results.data;
 
-      // Show preview table
+      // Reset Table
       tbody.innerHTML = "";
-      rows.forEach((row) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row["category_name"] || "-"}</td>
-          <td>${row["subcategory_name"] || "-"}</td>
-          <td>${row["product_name"] || "-"}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-
       table.style.display = "table";
+
       status.innerHTML =
         '<span style="color: var(--accent-primary)"> Uploading...</span>';
 
-      // Submit to backend
+      // Send to backend
       fetch(
         "https://joyful-backend-backend-final-4-production.up.railway.app/api/csv/import",
         {
@@ -133,10 +170,46 @@ function handleSubmit() {
       )
         .then((res) => res.json())
         .then((data) => {
-          if (data.success) {
-            status.innerHTML = `<span style="color: var(--success-color)"> ${data.message}</span>`;
+          const failedRows = data.failedRows || [];
+          const failedIndices = failedRows.map((r) => r.rowIndex);
+
+          // Reset table
+          tbody.innerHTML = "";
+          table.style.display = "table";
+
+          rows.forEach((row, index) => {
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+      <td>${row["category_name"] || "-"}</td>
+      <td>${row["subcategory_name"] || "-"}</td>
+      <td>${row["product_name"] || "-"}</td>
+    `;
+
+            const failedRow = failedRows.find((f) => f.rowIndex === index);
+            if (failedRow) {
+              tr.style.backgroundColor = "#ffd6d6"; // 🔴 red for failed row
+
+              const errorTd = document.createElement("td");
+              errorTd.colSpan = 3;
+              errorTd.style.color = "red";
+              errorTd.style.fontSize = "0.85rem";
+              errorTd.textContent = `⚠️ Error: ${failedRow.error}`;
+
+              const errorRow = document.createElement("tr");
+              errorRow.appendChild(errorTd);
+              tbody.appendChild(errorRow);
+            }
+
+            tbody.appendChild(tr);
+          });
+
+          const successCount = rows.length - failedIndices.length;
+
+          if (failedIndices.length === 0) {
+            status.innerHTML = `<span style="color: var(--success-color)">✅ ${successCount} rows imported successfully.</span>`;
           } else {
-            status.innerHTML = `<span style="color: var(--danger-color)"> ${data.message}</span>`;
+            status.innerHTML = `<span style="color: var(--warning-color)">⚠️ ${successCount} rows succeeded, ${failedIndices.length} failed.</span>`;
           }
         })
         .catch((err) => {
