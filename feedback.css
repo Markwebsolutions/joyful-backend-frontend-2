@@ -1,0 +1,174 @@
+/* Base Table */
+.table-container {
+  max-width: 90%;
+  margin: 2rem auto;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+.table-wrapper {
+  overflow-x: auto;
+}
+.grid-table {
+  display: grid;
+  grid-template-columns: 15% 15% 25% 15% 10% 20%;
+  padding: 1rem;
+  font-weight: bold;
+  background: #f3f4f6;
+  border-bottom: 2px solid #e5e7eb;
+  text-align: center;
+}
+#feedbackTableBody .grid-row {
+  display: grid;
+  grid-template-columns: 15% 15% 25% 15% 10% 20%;
+  padding: 1rem;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s;
+  text-align: center;
+}
+#feedbackTableBody .grid-row:hover {
+  background-color: #f9fafb;
+}
+.feedback-img {
+  max-width: 80px;
+  max-height: 60px;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+.delete-btn {
+  padding: 0.5rem 1rem;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.delete-btn:hover {
+  background: #b91c1c;
+}
+.top-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.search-input {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 200px;
+}
+.delete-all-btn {
+  background-color: #f43f5e;
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+.delete-all-btn:hover {
+  background-color: #be123c;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 10;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 8% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content input,
+.modal-content textarea {
+  margin-bottom: 12px;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.close-btn {
+  align-self: flex-end;
+  font-size: 24px;
+  cursor: pointer;
+  color: red;
+}
+/* Add/Edit Button Styles */
+button.edit-btn,
+button.add-btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+button.add-btn {
+  background-color: #10b981;
+  color: white;
+  background: linear-gradient(135deg, #10b981 0%, #047450 100%);
+}
+
+button.add-btn:hover {
+  background-color: #059669;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
+}
+
+button.edit-btn {
+  background-color: #3b82f6;
+  color: white;
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+}
+
+button.edit-btn:hover {
+  background-color: #2563eb;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+}
+
+/* Modal Form Buttons */
+.modal-content button {
+  padding: 0.6rem 1.2rem;
+  margin-right: 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#feedbackSaveBtn {
+  background-color: #10b981;
+  color: white;
+}
+
+#feedbackSaveBtn:hover {
+  background-color: #059669;
+}
+
+#feedbackCancelBtn {
+  background-color: #f3f4f6;
+  color: #111827;
+  border: 1px solid #ccc;
+}
+
+#feedbackCancelBtn:hover {
+  background-color: #e5e7eb;
+}
