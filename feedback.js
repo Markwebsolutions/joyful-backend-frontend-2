@@ -9,7 +9,9 @@ async function loadFeedbacks() {
   const data = await res.json();
   const tableBody = document.getElementById("feedbackTableBody");
   tableBody.innerHTML = "";
-  document.getElementById("feedbackCount").textContent = `Total Feedbacks: ${data.length}`;
+  document.getElementById(
+    "feedbackCount"
+  ).textContent = `Total Feedbacks: ${data.length}`;
 
   data.forEach((fb) => {
     const row = document.createElement("div");
@@ -20,12 +22,16 @@ async function loadFeedbacks() {
       <div>${fb.heading}</div>
       <div>${fb.description}</div>
       <div>
-        <img src="${fb.image || "https://dummyimage.com/80x60/cccccc/000000&text=No+Image"}" 
+        <img src="${
+          fb.image || "https://dummyimage.com/80x60/cccccc/000000&text=No+Image"
+        }" 
              alt="img" class="feedback-img"/>
       </div>
       <div>${fb.star || 0}</div>
       <div>
-        <button class="delete-btn" onclick="deleteFeedback(${fb.feedbackid})">Delete</button>
+        <button class="delete-btn" onclick="deleteFeedback(${
+          fb.feedbackid
+        })">Delete</button>
         <button class="edit-btn">Edit</button>
       </div>
     `;
@@ -57,36 +63,45 @@ function closeFeedbackModal() {
   document.getElementById("feedbackModal").style.display = "none";
 }
 
-document.getElementById("feedbackForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
+document
+  .getElementById("feedbackForm")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-  const payload = {
-    feedbackid: document.getElementById("feedbackid").value || null,
-    name: document.getElementById("name").value,
-    heading: document.getElementById("heading").value,
-    description: document.getElementById("description").value,
-    image: document.getElementById("image").value,
-    star: document.getElementById("star").value,
-  };
+    const starValue = parseInt(document.getElementById("star").value);
 
-  const method = payload.feedbackid ? "PUT" : "POST";
-  const url = payload.feedbackid
-    ? `${feedbackUrl}/update`
-    : `http://localhost:8080/feedback`; // POST endpoint
+    if (isNaN(starValue) || starValue < 1 || starValue > 5) {
+      alert("Star rating must be between 1 and 5.");
+      return;
+    }
 
-  const res = await fetch(url, {
-    method: method,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    const payload = {
+      feedbackid: document.getElementById("feedbackid").value || null,
+      name: document.getElementById("name").value,
+      heading: document.getElementById("heading").value,
+      description: document.getElementById("description").value,
+      image: document.getElementById("image").value,
+      star: starValue,
+    };
+
+    const method = payload.feedbackid ? "PUT" : "POST";
+    const url = payload.feedbackid
+      ? `${feedbackUrl}/update`
+      : `http://localhost:8080/feedback`; // POST endpoint
+
+    const res = await fetch(url, {
+      method: method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (res.ok) {
+      closeFeedbackModal();
+      loadFeedbacks();
+    } else {
+      alert("Something went wrong");
+    }
   });
-
-  if (res.ok) {
-    closeFeedbackModal();
-    loadFeedbacks();
-  } else {
-    alert("Something went wrong");
-  }
-});
 
 async function deleteFeedback(id) {
   if (!confirm("Delete this feedback?")) return;
@@ -117,11 +132,23 @@ async function deleteAllFeedback() {
 }
 
 function searchFeedback() {
-  const input = document.getElementById("searchFeedbackInput").value.toLowerCase();
+  const input = document
+    .getElementById("searchFeedbackInput")
+    .value.toLowerCase();
   const rows = document.querySelectorAll("#feedbackTableBody .grid-row");
 
   rows.forEach((row) => {
     const name = row.children[0].textContent.toLowerCase();
     row.style.display = name.includes(input) ? "grid" : "none";
   });
+}
+function previewFeedbackImage() {
+  const url = document.getElementById("image").value;
+  const preview = document.getElementById("feedbackImagePreview");
+  if (url) {
+    preview.src = url;
+    preview.style.display = "block";
+  } else {
+    preview.style.display = "none";
+  }
 }
