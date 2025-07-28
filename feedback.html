@@ -42,11 +42,11 @@
   </nav>
 
   <div class="top-bar container">
-    <h1 class="headings">Feedback Dashboard</h1>
+    <h1 class="headings">Review Dashboard</h1>
     <div class="top-controls">
       <input type="text" id="searchFeedbackInput" placeholder="Search by Name" class="search-input"
         onkeyup="searchFeedback()" />
-      <button onclick="openFeedbackModal()" class="add-btns"> + Add Feedback</button>
+      <button onclick="openFeedbackModal()" class="add-btns"> + Add Review</button>
 
       <div id="feedbackCount" class="category-count">Total Feedbacks: 0</div>
       <button class="delete-all-btn1" onclick="deleteAllFeedback()">Delete All</button>
@@ -71,7 +71,7 @@
   <div id="feedbackModal" class="modal" style="display: none">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 class="headings" id="feedbackModalTitle">Add Feedback</h2>
+        <h2 class="headings" id="feedbackModalTitle">Add Review</h2>
         <span class="close-btn" onclick="closeFeedbackModal()">&times;</span>
       </div>
       <form id="feedbackForm" class="modal-form">

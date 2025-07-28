@@ -10,41 +10,44 @@
 </head>
 
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="Dashboard.html" class="logo">AdminPanel</a>
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="Category.html">Category</a></li>
-                <li class="nav-item"><a href="subcategory.html">Sub-Category</a></li>
-                <li class="nav-item"><a href="product.html">Products</a></li>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="Dashboard.html" class="logo">AdminPanel</a>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="Category.html">Category</a></li>
+        <li class="nav-item"><a href="subcategory.html">Sub-Category</a></li>
+        <li class="nav-item"><a href="product.html">Products</a></li>
 
-                <li class="nav-item">
-                    <a href="csvupload.html">Upload CSV</a>
-                </li>
-                <li class="nav-item">
-                    <a href="productenquiry.html">Product Enquiry</a>
-                </li>
-                <li class="nav-item">
-                    <a href="GeneralEnquiry.html">General Enquiry</a>
-                </li>
-                <li class="nav-item">
-                    <a href="subscribe.html">Subscribe</a>
-                </li>
-                <li class="nav-item">
-                    <a href="feedback.html">Reviews</a>
-                </li>
-                <li class="nav-item">
-                    <button class="logout" onclick="logout()">Logout</button>
-                </li>
-            </ul>
-        </div>
-    </nav>
+        <li class="nav-item">
+          <a href="csvupload.html">Upload CSV</a>
+        </li>
+        <li class="nav-item">
+          <a href="productenquiry.html">Product Enquiry</a>
+        </li>
+        <li class="nav-item">
+          <a href="GeneralEnquiry.html">General Enquiry</a>
+        </li>
+        <li class="nav-item">
+          <a href="subscribe.html">Subscribe</a>
+        </li>
+        <li class="nav-item">
+          <a href="feedback.html">Reviews</a>
+        </li>
+        <li class="nav-item">
+          <button class="logout" onclick="logout()">Logout</button>
+        </li>
+      </ul>
+    </div>
+  </nav>
 
   <div class="top-bar container">
     <h1 class="headings">Product Enquiry</h1>
     <div class="top-controls">
+      <input type="text" id="searchEnquiryInput" oninput="searchEnquiries()" placeholder="Search by email"
+        class="search-input" />
       <div id="enquiryCount" class="category-count">Total Product Enquiry:0</div>
+      <button onclick="deleteAllEnquiries()" class="delete-all-btn">Delete All</button>
     </div>
   </div>
 
@@ -128,6 +131,33 @@
         alert("Failed to delete enquiry.");
       }
     }
+    function searchEnquiries() {
+      const input = document.getElementById("searchEnquiryInput").value.toLowerCase();
+      const rows = document.querySelectorAll("#enquiryTableBody .table-row");
+
+      rows.forEach((row) => {
+        const email = row.children[1].textContent.toLowerCase(); // 2nd column is email
+        row.style.display = email.includes(input) ? "grid" : "none";
+      });
+    }
+
+    async function deleteAllEnquiries() {
+      if (!confirm("Are you sure you want to delete ALL enquiries?")) return;
+
+      try {
+        const res = await fetch("http://localhost:8080/enquiries", {
+          method: "DELETE",
+        });
+        const json = await res.json();
+
+        alert(json.message || "Deleted all enquiries.");
+        getAllEnquiries();
+      } catch (err) {
+        console.error("Delete all failed:", err);
+        alert("Failed to delete all enquiries.");
+      }
+    }
+
   </script>
 </body>
 

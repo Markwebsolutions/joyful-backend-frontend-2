@@ -70,6 +70,38 @@
   z-index: 10;
   text-align: center;
 }
+.top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.top-controls input[type="text"] {
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius);
+  width: 250px;
+}
+
+.delete-all-btn {
+  background-color: var(--danger-color);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.delete-all-btn:hover {
+  background-color: #b91c1c;
+  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+}
 
 /* === Replaces both <tr> and <td> with divs === */
 .table-row {

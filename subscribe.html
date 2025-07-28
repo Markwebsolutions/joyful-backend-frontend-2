@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GeneralEnquiry Section</title>
     <link rel="stylesheet" href="global.css">
-    <link rel="stylesheet" href="GeneralEnquiry.css">
+    <link rel="stylesheet" href="./subscribe.css">
 </head>
 
 <body>
@@ -41,14 +41,29 @@
         </div>
     </nav>
     <div class="top-bar container">
-        <h1 class="headings">General Enquiry</h1>
+        <h1 class="headings">Subscription Dashboard</h1>
         <div class="top-controls">
-            <div id="generalEnquiryCount" class="category-count">Total Enquiry:0</div>
+            <input type="text" id="searchSubscribeInput" placeholder="Search by Email" class="search-input"
+                onkeyup="searchSubscribe()" />
+            <div id="generalEnquiryCount" class="category-count">Total Subscription: 0</div>
+            <button class="delete-all-btn1" onclick="deleteAllSubscriptions()">Delete All</button>
         </div>
     </div>
 
-    <script src="Logout.js"></script>
+    <div class="table-container">
+        <div class="table-wrapper">
+            <div class="table-header grid-table">
+                <div>Email</div>
+                <div>Subscribed Date</div>
+                <div>Actions</div>
+            </div>
+            <div id="subscribeTableBody"></div>
+        </div>
+    </div>
 
+
+    <script src="Logout.js"></script>
+    <script src="./subscribe.js"></script>
 </body>
 
 </html>

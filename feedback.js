@@ -48,8 +48,8 @@ async function loadFeedbacks() {
 function openFeedbackModal(feedback = null) {
   document.getElementById("feedbackModal").style.display = "block";
   document.getElementById("feedbackModalTitle").textContent = feedback
-    ? "Edit Feedback"
-    : "Add Feedback";
+    ? "Edit Review"
+    : "Add Review";
 
   document.getElementById("feedbackid").value = feedback?.feedbackid || "";
   document.getElementById("name").value = feedback?.name || "";
