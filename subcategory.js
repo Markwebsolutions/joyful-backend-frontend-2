@@ -1,7 +1,7 @@
 const baseUrl =
-  "https://joyful-backend-backend-final-4-production.up.railway.app/subcategories";
+  "http://localhost:8080/subcategories";
 const categoryUrl =
-  "https://joyful-backend-backend-final-4-production.up.railway.app/categories";
+  "http://localhost:8080/categories";
 
 const subcategoryMap = new Map(); // Store subcategories
 let allCategories = []; // Store loaded category list
