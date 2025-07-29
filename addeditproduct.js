@@ -35,16 +35,40 @@ window.onload = async () => {
 
 // ⬇️ Same functions from your product.js — no changes needed
 function previewMainImage() {
-  const url = document.getElementById("mainImage").value;
+  let input = document.getElementById("mainImage");
+  let value = input.value.trim();
+
+  // 🧠 If it's a local path like D:\joyful-img\file.png
+  if (
+    value.startsWith("D:\\joyful-img\\") ||
+    value.startsWith("D:/joyful-img/")
+  ) {
+    const fileName = value.split(/\\|\//).pop(); // extract just filename
+    value = "https://webimage.joyful.co.in/" + fileName;
+    input.value = value; // auto-fill converted FTP URL
+  }
+
   const img = document.getElementById("mainImagePreview");
-  img.src = url || "";
-  img.style.display = url ? "block" : "none";
+  img.src = value;
+  img.style.display = value ? "block" : "none";
 }
+
 function previewHoverImage() {
-  const url = document.getElementById("hoverImage").value;
+  let input = document.getElementById("hoverImage");
+  let value = input.value.trim();
+
+  if (
+    value.startsWith("D:\\joyful-img\\") ||
+    value.startsWith("D:/joyful-img/")
+  ) {
+    const fileName = value.split(/\\|\//).pop();
+    value = "https://webimage.joyful.co.in/" + fileName;
+    input.value = value;
+  }
+
   const img = document.getElementById("hoverImagePreview");
-  img.src = url || "";
-  img.style.display = url ? "block" : "none";
+  img.src = value;
+  img.style.display = value ? "block" : "none";
 }
 
 function toggleSubcategoryDropdown() {

@@ -16,7 +16,7 @@ function submitBulkData() {
       if (!validateCSVFields(rows)) return;
 
       fetch(
-        "https://joyful-backend-backend-final-4-production.up.railway.app/api/csv/import",
+        "http://localhost:8080/api/csv/import",
         {
           method: "POST",
           headers: {
@@ -100,52 +100,6 @@ function handleSubmit() {
   status.innerHTML =
     '<span style="color: var(--warning-color)"> Reading file...</span>';
 
-  // Papa.parse(file, {
-  //   header: true,
-  //   skipEmptyLines: true,
-  //   complete: function (results) {
-  //     const rows = results.data;
-
-  //     // Show preview table
-  //     tbody.innerHTML = "";
-  //     rows.forEach((row) => {
-  //       const tr = document.createElement("tr");
-  //       tr.innerHTML = `
-  //         <td>${row["category_name"] || "-"}</td>
-  //         <td>${row["subcategory_name"] || "-"}</td>
-  //         <td>${row["product_name"] || "-"}</td>
-  //       `;
-  //       tbody.appendChild(tr);
-  //     });
-
-  //     table.style.display = "table";
-  //     status.innerHTML =
-  //       '<span style="color: var(--accent-primary)"> Uploading...</span>';
-
-  //     // Submit to backend
-  //     fetch(
-  //       "https://joyful-backend-backend-final-4-production.up.railway.app/api/csv/import",
-  //       {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify(rows),
-  //       }
-  //     )
-  //       .then((res) => res.json())
-  //       .then((data) => {
-  //         if (data.success) {
-  //           status.innerHTML = `<span style="color: var(--success-color)"> ${data.message}</span>`;
-  //         } else {
-  //           status.innerHTML = `<span style="color: var(--danger-color)"> ${data.message}</span>`;
-  //         }
-  //       })
-  //       .catch((err) => {
-  //         console.error(err);
-  //         status.innerHTML =
-  //           '<span style="color: var(--danger-color)">🚫 Upload failed. Check server.</span>';
-  //       });
-  //   },
-  // });
   Papa.parse(file, {
     header: true,
     skipEmptyLines: true,
@@ -161,7 +115,7 @@ function handleSubmit() {
 
       // Send to backend
       fetch(
-        "https://joyful-backend-backend-final-4-production.up.railway.app/api/csv/import",
+        "http://localhost:8080/api/csv/import",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

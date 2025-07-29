@@ -10,7 +10,6 @@
 </head>
 
 <body>
-  <!-- Navigation Bar -->
   <nav class="navbar">
     <div class="nav-container">
       <a href="Dashboard.html" class="logo">AdminPanel</a>
@@ -18,25 +17,12 @@
         <li class="nav-item"><a href="Category.html">Category</a></li>
         <li class="nav-item"><a href="subcategory.html">Sub-Category</a></li>
         <li class="nav-item"><a href="product.html">Products</a></li>
-
-        <li class="nav-item">
-          <a href="csvupload.html">Upload CSV</a>
-        </li>
-        <li class="nav-item">
-          <a href="productenquiry.html">Product Enquiry</a>
-        </li>
-        <li class="nav-item">
-          <a href="GeneralEnquiry.html">General Enquiry</a>
-        </li>
-        <li class="nav-item">
-          <a href="subscribe.html">Subscribe</a>
-        </li>
-        <li class="nav-item">
-          <a href="feedback.html">Reviews</a>
-        </li>
-        <li class="nav-item">
-          <button class="logout" onclick="logout()">Logout</button>
-        </li>
+        <li class="nav-item"><a href="csvupload.html">Upload CSV</a></li>
+        <li class="nav-item"><a href="productenquiry.html">Product Enquiry</a></li>
+        <li class="nav-item"><a href="GeneralEnquiry.html">General Enquiry</a></li>
+        <li class="nav-item"><a href="subscribe.html">Subscribe</a></li>
+        <li class="nav-item"><a href="feedback.html">Reviews</a></li>
+        <li class="nav-item"><button class="logout" onclick="logout()">Logout</button></li>
       </ul>
     </div>
   </nav>
@@ -47,7 +33,6 @@
       <input type="text" id="searchFeedbackInput" placeholder="Search by Name" class="search-input"
         onkeyup="searchFeedback()" />
       <button onclick="openFeedbackModal()" class="add-btns"> + Add Review</button>
-
       <button class="delete-all-btn1" onclick="deleteAllFeedback()">Delete All</button>
       <div id="feedbackCount" class="category-count">Total Feedbacks: 0</div>
     </div>
@@ -67,7 +52,6 @@
     </div>
   </div>
 
-  <!-- Add/Edit Feedback Modal -->
   <div id="feedbackModal" class="modal" style="display: none">
     <div class="modal-content">
       <div class="modal-header">
@@ -93,14 +77,14 @@
         </div>
 
         <div class="form-group">
-          <label>Image URL:</label>
-          <input type="text" id="image" placeholder="Paste image URL" oninput="previewFeedbackImage()" />
+          <label><span class="required">*</span> Image URL (Web or Local Path):</label>
+          <input type="text" id="image" placeholder="Enter image URL or local path" oninput="previewFeedbackImage()" />
           <img id="feedbackImagePreview" src="" alt="Preview" class="image-preview" style="display: none;" />
         </div>
 
         <div class="form-group">
           <label><span class="required">*</span> Stars (1 to 5):</label>
-        <input type="number" id="star" name="star" min="1" max="5" />
+          <input type="number" id="star" name="star" min="1" max="5" />
         </div>
 
         <div class="form-buttons">
@@ -115,4 +99,5 @@
   <script src="./Logout.js"></script>
   <script src="./feedback.js"></script>
 </body>
+
 </html>

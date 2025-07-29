@@ -17,6 +17,7 @@ async function loadFeedbacks() {
     const row = document.createElement("div");
     row.classList.add("grid-row");
     row.setAttribute("data-id", fb.feedbackid);
+
     row.innerHTML = `
       <div>${fb.name}</div>
       <div>${fb.heading}</div>
@@ -29,14 +30,14 @@ async function loadFeedbacks() {
       </div>
       <div>${fb.star || 0}</div>
       <div>
+       <button class="edit-btn">Edit</button>
         <button class="delete-btn" onclick="deleteFeedback(${
           fb.feedbackid
         })">Delete</button>
-        <button class="edit-btn">Edit</button>
+       
       </div>
     `;
 
-    // ✅ Add working edit button handler with correct data
     row.querySelector(".edit-btn").addEventListener("click", () => {
       openFeedbackModal(fb);
     });
@@ -55,8 +56,12 @@ function openFeedbackModal(feedback = null) {
   document.getElementById("name").value = feedback?.name || "";
   document.getElementById("heading").value = feedback?.heading || "";
   document.getElementById("description").value = feedback?.description || "";
-  document.getElementById("image").value = feedback?.image || "";
   document.getElementById("star").value = feedback?.star || "";
+  document.getElementById("image").value = feedback?.image || "";
+
+  const preview = document.getElementById("feedbackImagePreview");
+  preview.src = feedback?.image || "";
+  preview.style.display = feedback?.image ? "block" : "none";
 }
 
 function closeFeedbackModal() {
@@ -69,7 +74,6 @@ document
     e.preventDefault();
 
     const starValue = parseInt(document.getElementById("star").value);
-
     if (isNaN(starValue) || starValue < 1 || starValue > 5) {
       alert("Star rating must be between 1 and 5.");
       return;
@@ -80,17 +84,12 @@ document
       name: document.getElementById("name").value,
       heading: document.getElementById("heading").value,
       description: document.getElementById("description").value,
-      image: document.getElementById("image").value,
+      image: document.getElementById("image").value.trim(),
       star: starValue,
     };
 
-    const method = payload.feedbackid ? "PUT" : "POST";
-    const url = payload.feedbackid
-      ? `${feedbackUrl}/update`
-      : `http://localhost:8080/feedback`; // POST endpoint
-
-    const res = await fetch(url, {
-      method: method,
+    const res = await fetch("http://localhost:8080/feedback", {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
@@ -99,7 +98,7 @@ document
       closeFeedbackModal();
       loadFeedbacks();
     } else {
-      alert("Something went wrong");
+      alert("Something went wrong. Check server logs.");
     }
   });
 
@@ -142,13 +141,16 @@ function searchFeedback() {
     row.style.display = name.includes(input) ? "grid" : "none";
   });
 }
+
 function previewFeedbackImage() {
-  const url = document.getElementById("image").value;
+  const url = document.getElementById("image").value.trim();
   const preview = document.getElementById("feedbackImagePreview");
+
   if (url) {
     preview.src = url;
     preview.style.display = "block";
   } else {
+    preview.src = "";
     preview.style.display = "none";
   }
 }

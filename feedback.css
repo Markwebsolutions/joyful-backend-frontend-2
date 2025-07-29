@@ -59,14 +59,14 @@
 }
 .delete-btn {
   padding: 0.5rem 1rem;
-  background: #ef4444;
+  background: #dd0505;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
 }
 .delete-btn:hover {
-  background: #b91c1c;
+  background: #a70303;
 }
 .top-controls {
   display: flex;
@@ -316,8 +316,8 @@ button.edit-btn:hover {
 }
 
 .image-preview {
-  width: 100%;
-  max-height: 200px;
+  width: 40%;
+  max-height: 300px;
   margin: 10px 0;
   border-radius: var(--border-radius);
   display: none;
