@@ -1,4 +1,4 @@
-const subscribeUrl = "http://localhost:8080/subscription";
+const subscribeUrl = "https://joyfulbackend-production.up.railway.app/subscription";
 
 window.onload = () => {
   loadSubscriptions();
@@ -45,7 +45,7 @@ async function loadSubscriptions() {
 async function deleteSubscription(id) {
   if (!confirm("Delete this subscription?")) return;
   const res = await fetch(
-    `http://localhost:8080/deletesubscription?subid=${id}`,
+    `https://joyfulbackend-production.up.railway.app/deletesubscription?subid=${id}`,
     {
       method: "DELETE",
     }
@@ -56,7 +56,7 @@ async function deleteSubscription(id) {
 
 async function deleteAllSubscriptions() {
   if (!confirm("Delete all subscriptions?")) return;
-  const res = await fetch(`http://localhost:8080/deleteAllSubscription`, {
+  const res = await fetch(`https://joyfulbackend-production.up.railway.app/deleteAllSubscription`, {
     method: "DELETE",
   });
   if (res.ok) loadSubscriptions();

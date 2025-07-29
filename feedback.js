@@ -1,4 +1,4 @@
-const feedbackUrl = "http://localhost:8080/feedbacks";
+const feedbackUrl = "https://joyfulbackend-production.up.railway.app/feedbacks";
 
 window.onload = () => {
   loadFeedbacks();
@@ -88,7 +88,7 @@ document
       star: starValue,
     };
 
-    const res = await fetch("http://localhost:8080/feedback", {
+    const res = await fetch("https://joyfulbackend-production.up.railway.app/feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -105,7 +105,7 @@ document
 async function deleteFeedback(id) {
   if (!confirm("Delete this feedback?")) return;
 
-  const res = await fetch(`http://localhost:8080/deletefeedback?id=${id}`, {
+  const res = await fetch(`https://joyfulbackend-production.up.railway.app/deletefeedback?id=${id}`, {
     method: "DELETE",
   });
 
@@ -119,7 +119,7 @@ async function deleteFeedback(id) {
 async function deleteAllFeedback() {
   if (!confirm("Delete all feedbacks?")) return;
 
-  const res = await fetch(`http://localhost:8080/deleteAllFeedback`, {
+  const res = await fetch(`https://joyfulbackend-production.up.railway.app/deleteAllFeedback`, {
     method: "DELETE",
   });
 

@@ -1,7 +1,7 @@
 const baseUrl =
-  "http://localhost:8080/products";
+  "https://joyfulbackend-production.up.railway.app/products";
 const subcategoryUrl =
-  "http://localhost:8080/subcategories";
+  "https://joyfulbackend-production.up.railway.app/subcategories";
 
 async function loadProducts() {
   try {

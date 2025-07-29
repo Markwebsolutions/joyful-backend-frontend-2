@@ -1,4 +1,4 @@
-const enquiryUrl = "http://localhost:8080/all-query";
+const enquiryUrl = "https://joyfulbackend-production.up.railway.app/all-query";
 
 window.onload = () => {
   getAllGeneralEnquiries();
@@ -68,7 +68,7 @@ async function deleteAllGeneralEnquiries() {
   if (!confirmDelete) return;
 
   try {
-    const res = await fetch("http://localhost:8080/deleteAllGeneralEnquiry", {
+    const res = await fetch("https://joyfulbackend-production.up.railway.app/deleteAllGeneralEnquiry", {
       method: "DELETE",
     });
 
@@ -89,7 +89,7 @@ async function deleteEnquiry(id) {
   if (!confirmDelete) return;
 
   try {
-    const res = await fetch(`http://localhost:8080/delete-query/${id}`, {
+    const res = await fetch(`https://joyfulbackend-production.up.railway.app/delete-query/${id}`, {
       method: "DELETE",
     });
 

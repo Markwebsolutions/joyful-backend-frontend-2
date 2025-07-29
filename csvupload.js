@@ -16,7 +16,7 @@ function submitBulkData() {
       if (!validateCSVFields(rows)) return;
 
       fetch(
-        "http://localhost:8080/api/csv/import",
+        "https://joyfulbackend-production.up.railway.app/api/csv/import",
         {
           method: "POST",
           headers: {
@@ -115,7 +115,7 @@ function handleSubmit() {
 
       // Send to backend
       fetch(
-        "http://localhost:8080/api/csv/import",
+        "https://joyfulbackend-production.up.railway.app/api/csv/import",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

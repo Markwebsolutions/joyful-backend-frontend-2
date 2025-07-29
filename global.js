@@ -1,14 +1,14 @@
 const categoryUrl =
-  "http://localhost:8080/categories";
+  "https://joyfulbackend-production.up.railway.app/categories";
 const subcategoryUrl =
-  "http://localhost:8080/subcategories";
+  "https://joyfulbackend-production.up.railway.app/subcategories";
 const productUrl =
-  "http://localhost:8080/products";
+  "https://joyfulbackend-production.up.railway.app/products";
 const enquiryUrl =
-  "http://localhost:8080/enquiries";
+  "https://joyfulbackend-production.up.railway.app/enquiries";
 
 const generalEnquiryUrl =
-  "http://localhost:8080/all-query";
+  "https://joyfulbackend-production.up.railway.app/all-query";
 async function loadCategoryCount() {
   try {
     const res = await fetch(categoryUrl);
