@@ -44,7 +44,7 @@ function previewMainImage() {
     value.startsWith("D:/joyful-img/")
   ) {
     const fileName = value.split(/\\|\//).pop(); // extract just filename
-    value = "https://webimage.joyful.co.in/" + fileName;
+    value = "https://joyful.in/webimage/" + fileName;
     input.value = value; // auto-fill converted FTP URL
   }
 
@@ -62,7 +62,7 @@ function previewHoverImage() {
     value.startsWith("D:/joyful-img/")
   ) {
     const fileName = value.split(/\\|\//).pop();
-    value = "https://webimage.joyful.co.in/" + fileName;
+    value = "https://joyful.in/webimage/" + fileName;
     input.value = value;
   }
 
